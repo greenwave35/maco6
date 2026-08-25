@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MACO 6 | 거래내역 자동 정리·보고서 생성</title>
+  <style>
+    :root{--navy:#172554;--rose:#e11d48;--orange:#f97316;--purple:#7c3aed;--ink:#1f2937;--muted:#64748b;--line:#e2e8f0;--paper:#fff;--bg:#fff7f8;--code:#111827;--green:#15803d}
+    *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:88px}body{margin:0;color:var(--ink);background:var(--bg);font-family:"Pretendard","Noto Sans KR","Malgun Gothic",sans-serif;line-height:1.72}
+    body.locked{overflow:hidden}.hero{padding:70px 24px 60px;color:#fff;text-align:center;background:linear-gradient(135deg,#172554 0%,#7c3aed 48%,#e11d48 100%)}.eyebrow{margin:0 0 8px;font-weight:900;letter-spacing:.15em;opacity:.8}.hero h1{margin:0;font-size:clamp(2.25rem,6vw,4.5rem);line-height:1.12}.hero p{max-width:850px;margin:18px auto 0;font-size:1.12rem;opacity:.92}
+    .nav-wrap{position:sticky;top:0;z-index:20;padding:12px 16px;background:rgba(255,255,255,.95);border-bottom:1px solid var(--line);box-shadow:0 5px 18px rgba(15,23,42,.08);backdrop-filter:blur(12px)}nav{display:flex;justify-content:center;gap:9px;overflow:auto}nav a,.pill{padding:8px 15px;color:#9f1239;background:#fff1f2;border:1px solid #fecdd3;border-radius:999px;font-weight:900;text-decoration:none;white-space:nowrap}nav a:hover,.pill:hover{color:#fff;background:var(--rose)}
+    main{width:min(1100px,calc(100% - 32px));margin:38px auto 75px}.lesson{margin-bottom:32px;padding:clamp(24px,5vw,52px);background:var(--paper);border:1px solid var(--line);border-radius:25px;box-shadow:0 15px 38px rgba(80,25,50,.07)}.section-label{margin:0 0 5px;color:var(--rose);font-weight:900;letter-spacing:.1em}h2{margin:0 0 22px;color:var(--navy);font-size:clamp(1.9rem,4vw,3rem);line-height:1.22}h3{margin:36px 0 12px;color:var(--navy);font-size:1.42rem}h4{margin:0 0 7px;color:var(--navy);font-size:1.08rem}p{margin:8px 0 14px}.lead{color:#475569;font-size:1.08rem}
+    .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px}.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}.card{padding:20px;background:#fff8fa;border:1px solid #ffe4e6;border-radius:16px}.number{display:inline-grid;place-items:center;width:36px;height:36px;margin-bottom:9px;color:#fff;background:var(--rose);border-radius:10px;font-weight:900}.flow{display:flex;align-items:center;justify-content:center;gap:9px;flex-wrap:wrap;margin:20px 0}.flow span{padding:9px 13px;background:#fce7f3;border-radius:10px;font-weight:800}.flow b{color:var(--rose)}
+    .note,.tip,.warning{margin:18px 0;padding:16px 18px;border-radius:13px;border-left:5px solid}.note{background:#f5f3ff;border-color:var(--purple)}.tip{background:#f0fdf4;border-color:var(--green)}.warning{background:#fff7ed;border-color:var(--orange)}
+    .downloads{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin:18px 0}.download{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:17px 18px;color:var(--navy);background:#fff;border:1px solid #fecdd3;border-radius:14px;text-decoration:none;font-weight:850}.download:hover{border-color:var(--rose);box-shadow:0 8px 20px rgba(225,29,72,.1)}.download small{display:block;color:var(--muted);font-weight:600}.download b{color:var(--rose);white-space:nowrap}
+    .code-title{display:flex;justify-content:space-between;margin-top:18px;padding:9px 14px;color:#cbd5e1;background:#1e293b;border-radius:13px 13px 0 0;font-size:.88rem;font-weight:800}pre{margin:0;padding:20px;overflow:auto;color:#e5e7eb;background:var(--code);border-radius:0 0 13px 13px;font:15px/1.65 Consolas,"Courier New",monospace;tab-size:4}code{font-family:Consolas,"Courier New",monospace}:not(pre)>code{padding:2px 6px;color:#be123c;background:#fff1f2;border-radius:5px}.kw{color:#c084fc}.fn{color:#60a5fa}.str{color:#86efac}.num{color:#fdba74}.cm{color:#94a3b8}.cls{color:#facc15}
+    .output{margin-top:10px;padding:14px 17px;color:#14532d;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;font-family:Consolas,"Courier New",monospace;white-space:pre-line}table{width:100%;margin:15px 0;border-collapse:collapse}th,td{padding:12px 14px;border:1px solid var(--line);text-align:left}th{color:var(--navy);background:#ffe4e6}.check{margin:12px 0;padding-left:0;list-style:none}.check li{margin:8px 0;padding-left:29px;position:relative}.check li::before{content:"✓";position:absolute;left:0;color:var(--green);font-weight:900}.section-footer{display:flex;justify-content:flex-end;margin-top:30px;padding-top:20px;border-top:1px dashed #cbd5e1}footer{padding:25px;color:var(--muted);text-align:center}
+    .password-screen{position:fixed;inset:0;z-index:9999;display:grid;place-items:center;padding:24px;background:linear-gradient(135deg,#172554 0%,#7c3aed 48%,#e11d48 100%);transition:.25s}.password-screen.open{visibility:hidden;opacity:0;pointer-events:none}.password-box{width:min(440px,100%);padding:38px 34px;background:#fff;border-radius:24px;box-shadow:0 24px 70px rgba(15,23,42,.38);text-align:center}.lock-icon{display:grid;place-items:center;width:64px;height:64px;margin:0 auto 18px;color:#fff;background:var(--rose);border-radius:18px;font-size:1.8rem}.password-box h1{margin:0 0 8px;color:var(--navy);font-size:1.8rem}.password-box p{margin:0 0 22px;color:var(--muted)}.password-box input{width:100%;height:52px;padding:0 16px;border:2px solid var(--line);border-radius:12px;outline:none;font-size:1.05rem;text-align:center;letter-spacing:.12em}.password-box input:focus{border-color:var(--rose);box-shadow:0 0 0 4px #ffe4e6}.password-submit{width:100%;height:52px;margin-top:12px;color:#fff;background:var(--rose);border:0;border-radius:12px;cursor:pointer;font-size:1rem;font-weight:900}.password-message{min-height:27px;margin:10px 0 0!important;color:#dc2626!important;font-weight:700}
+    @media(max-width:760px){nav{justify-content:flex-start}.grid,.grid.two,.downloads{grid-template-columns:1fr}.lesson{border-radius:18px}table{display:block;overflow-x:auto;white-space:nowrap}}
+    @media print{.nav-wrap,.password-screen,.section-footer{display:none}body{background:#fff}.hero{padding:35px;print-color-adjust:exact}main{width:100%;margin:0}.lesson{box-shadow:none;border-radius:0}pre,.note,.tip,.warning{print-color-adjust:exact}}
+  </style>
+</head>
+<body id="top" class="locked">
+  <div class="password-screen" id="passwordScreen" role="dialog" aria-modal="true" aria-labelledby="passwordTitle">
+    <form class="password-box" id="passwordForm">
+      <div class="lock-icon">🔒</div><h1 id="passwordTitle">MACO 6 수업자료</h1>
+      <p>비밀번호를 입력하면 자료가 열립니다.</p>
+      <input id="passwordInput" type="password" inputmode="numeric" autocomplete="off" placeholder="비밀번호 입력" autofocus required>
+      <button class="password-submit" type="submit">자료 열기</button><p class="password-message" id="passwordMessage" aria-live="polite"></p>
+    </form>
+  </div>
+
+  <header class="hero"><p class="eyebrow">MACO 6 · PYTHON WORK AUTOMATION</p><h1>거래내역 자동 정리·보고서 생성</h1><p>폴더에 들어 있는 카드·통장 거래내역 CSV를 자동으로 통합하고, 오류 검사와 계정과목 분류를 거쳐 Excel 보고서를 생성합니다.</p></header>
+  <div class="nav-wrap"><nav><a href="#overview">개요</a><a href="#download">실습파일</a><a href="#step1">1. 통합</a><a href="#step2">2. 검증·분류</a><a href="#step3">3. Excel 보고서</a><a href="#finish">정리</a></nav></div>
+
+  <main>
+    <section class="lesson" id="overview"><p class="section-label">PROJECT OVERVIEW</p><h2>프로젝트 개요</h2><p class="lead">한 건씩 직접 입력하지 않습니다. 정해진 폴더에 거래내역 파일을 넣고 프로그램을 실행하면 파이썬이 반복 작업을 일괄 처리합니다.</p>
+      <div class="grid"><article class="card"><span class="number">1</span><h4>파일 자동 검색·통합</h4><p>입력 폴더의 CSV 파일을 찾아 하나로 합칩니다.</p></article><article class="card"><span class="number">2</span><h4>검증·자동 분류</h4><p>누락과 금액 오류를 찾고 거래처 규칙으로 계정과목을 분류합니다.</p></article><article class="card"><span class="number">3</span><h4>보고서 자동 생성</h4><p>전체·요약·확인필요 시트가 있는 Excel 파일을 만듭니다.</p></article></div>
+      <h3>자동화 처리 흐름</h3><div class="flow"><span>CSV 여러 개</span><b>→</b><span>자동 검색</span><b>→</b><span>통합</span><b>→</b><span>오류 검사</span><b>→</b><span>계정과목 분류</span><b>→</b><span>Excel 보고서</span></div>
+      <div class="warning"><strong>프로젝트 범위:</strong> 실제 회계 프로그램이 아니라 파일 통합·검증·분류·보고서 생성을 자동화하는 교육용 프로젝트입니다. 분류 결과는 최종 회계처리 전에 반드시 담당자가 확인합니다.</div>
+    </section>
+
+    <section class="lesson" id="download"><p class="section-label">PRACTICE FILES</p><h2>예시용 파일 다운로드</h2><p class="lead">먼저 묶음 파일을 내려받아 압축을 풉니다. 개별 CSV와 완성 결과 예시도 따로 확인할 수 있습니다.</p>
+      <div class="downloads">
+        <a class="download" href="maco6_sample_files.zip" download><span>📦 전체 실습파일 묶음<small>input 폴더의 CSV 3개 + 결과 Excel 예시</small></span><b>ZIP 받기</b></a>
+        <a class="download" href="거래내역_정리결과_예시.xlsx" download><span>📊 완성 결과 예시<small>전체·요약·확인필요 시트</small></span><b>XLSX 받기</b></a>
+        <a class="download" href="card_2026_08.csv" download><span>💳 8월 카드내역<small>정상 거래와 미분류 거래 포함</small></span><b>CSV 받기</b></a>
+        <a class="download" href="bank_2026_08.csv" download><span>🏦 8월 통장내역<small>자동이체·계좌이체 거래 포함</small></span><b>CSV 받기</b></a>
+        <a class="download" href="card_2026_09.csv" download><span>💳 9월 카드내역<small>거래처 누락·금액 오류 포함</small></span><b>CSV 받기</b></a>
+      </div>
+      <h3>폴더 구성</h3><div class="code-title"><span>폴더</span><span>압축을 푼 뒤 확인</span></div><pre><code>maco6_project/
+├── input/
+│   ├── card_2026_08.csv
+│   ├── bank_2026_08.csv
+│   └── card_2026_09.csv
+├── output/
+├── step1_merge.py
+├── step2_validate.py
+└── step3_report.py</code></pre>
+      <div class="note">세 CSV의 열 이름은 <code>거래일자, 거래처, 금액, 결제수단, 메모</code>로 같습니다. 실제 업무에서는 카드사·은행마다 열 이름이 다를 수 있으므로 먼저 표준화 과정이 필요합니다.</div>
+    </section>
+
+    <section class="lesson" id="step1"><p class="section-label">STEP 01</p><h2>여러 CSV 파일 자동 통합</h2><p class="lead"><code>pathlib</code>로 입력 폴더의 모든 CSV를 검색하고 <code>csv.DictReader</code>로 읽어 하나의 파일로 합칩니다.</p>
+      <div class="grid"><article class="card"><h4><code>Path.glob()</code></h4><p>조건에 맞는 파일을 한꺼번에 찾습니다.</p></article><article class="card"><h4><code>DictReader</code></h4><p>열 이름을 키로 사용해 한 행씩 읽습니다.</p></article><article class="card"><h4><code>DictWriter</code></h4><p>통합 결과를 열 이름과 함께 저장합니다.</p></article></div>
+      <div class="code-title"><span>step1_merge.py</span><span>CSV 검색·통합</span></div><pre><code><span class="kw">from</span> pathlib <span class="kw">import</span> Path
+<span class="kw">import</span> csv
+
+
+<span class="kw">def</span> <span class="fn">merge_csv_files</span>():
+    input_folder = Path(<span class="str">"input"</span>)
+    output_folder = Path(<span class="str">"output"</span>)
+    output_folder.mkdir(exist_ok=<span class="kw">True</span>)
+
+    csv_files = <span class="fn">list</span>(input_folder.glob(<span class="str">"*.csv"</span>))
+
+    <span class="kw">if not</span> csv_files:
+        <span class="fn">print</span>(<span class="str">"input 폴더에 CSV 파일이 없습니다."</span>)
+        <span class="kw">return</span>
+
+    merged_rows = []
+
+    <span class="kw">for</span> csv_file <span class="kw">in</span> csv_files:
+        <span class="kw">with</span> <span class="fn">open</span>(csv_file, <span class="str">"r"</span>, encoding=<span class="str">"utf-8-sig"</span>) <span class="kw">as</span> file:
+            reader = csv.DictReader(file)
+
+            <span class="kw">for</span> row <span class="kw">in</span> reader:
+                row[<span class="str">"원본파일"</span>] = csv_file.name
+                merged_rows.append(row)
+
+    fieldnames = [<span class="str">"원본파일"</span>, <span class="str">"거래일자"</span>, <span class="str">"거래처"</span>, <span class="str">"금액"</span>, <span class="str">"결제수단"</span>, <span class="str">"메모"</span>]
+    output_path = output_folder / <span class="str">"merged_transactions.csv"</span>
+
+    <span class="kw">with</span> <span class="fn">open</span>(output_path, <span class="str">"w"</span>, newline=<span class="str">""</span>, encoding=<span class="str">"utf-8-sig"</span>) <span class="kw">as</span> file:
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(merged_rows)
+
+    <span class="fn">print</span>(<span class="str">f"{len(csv_files)}개 파일, {len(merged_rows)}건을 통합했습니다."</span>)
+    <span class="fn">print</span>(<span class="str">f"저장 위치: {output_path.resolve()}"</span>)
+
+
+merge_csv_files()</code></pre>
+      <div class="output"><strong>실행 결과</strong>
+3개 파일, 18건을 통합했습니다.
+저장 위치: ...\output\merged_transactions.csv</div>
+      <div class="tip"><strong>자동화 포인트:</strong> 다음 달 CSV가 추가되어도 코드를 수정할 필요가 없습니다. <code>input</code> 폴더에 넣고 다시 실행하면 됩니다.</div><div class="section-footer"><a class="pill" href="#top">↑ 맨 위로</a></div>
+    </section>
+
+    <section class="lesson" id="step2"><p class="section-label">STEP 02</p><h2>오류 검증과 계정과목 자동 분류</h2><p class="lead">통합 파일의 각 행을 검사합니다. 정상 거래는 <code>clean_transactions.csv</code>에, 오류 또는 분류 확인이 필요한 거래는 <code>review_transactions.csv</code>에 저장합니다.</p>
+      <h3>분류 규칙</h3><table><thead><tr><th>거래처 키워드</th><th>자동 분류 계정과목</th></tr></thead><tbody><tr><td>스타벅스, 배달의민족</td><td>복리후생비</td></tr><tr><td>쿠팡, 알파문구</td><td>소모품비</td></tr><tr><td>코레일</td><td>여비교통비</td></tr><tr><td>한국전력</td><td>수도광열비</td></tr><tr><td>KT, 네이버클라우드</td><td>통신비</td></tr><tr><td>그 밖의 거래</td><td>확인 필요</td></tr></tbody></table>
+      <div class="code-title"><span>step2_validate.py</span><span>검증·분류·오류 분리</span></div><pre><code><span class="kw">from</span> pathlib <span class="kw">import</span> Path
+<span class="kw">import</span> csv
+
+
+ACCOUNT_RULES = {
+    <span class="str">"스타벅스"</span>: <span class="str">"복리후생비"</span>, <span class="str">"배달의민족"</span>: <span class="str">"복리후생비"</span>,
+    <span class="str">"쿠팡"</span>: <span class="str">"소모품비"</span>, <span class="str">"알파문구"</span>: <span class="str">"소모품비"</span>,
+    <span class="str">"코레일"</span>: <span class="str">"여비교통비"</span>, <span class="str">"한국전력"</span>: <span class="str">"수도광열비"</span>,
+    <span class="str">"사무실임대"</span>: <span class="str">"임차료"</span>, <span class="str">"KT"</span>: <span class="str">"통신비"</span>,
+    <span class="str">"네이버클라우드"</span>: <span class="str">"통신비"</span>, <span class="str">"국세청"</span>: <span class="str">"세금과공과"</span>,
+    <span class="str">"세무법인"</span>: <span class="str">"지급수수료"</span>
+}
+
+
+<span class="kw">def</span> <span class="fn">classify_account</span>(merchant):
+    <span class="kw">for</span> keyword, account <span class="kw">in</span> ACCOUNT_RULES.items():
+        <span class="kw">if</span> keyword <span class="kw">in</span> merchant:
+            <span class="kw">return</span> account
+    <span class="kw">return</span> <span class="str">"확인 필요"</span>
+
+
+<span class="kw">def</span> <span class="fn">validate_row</span>(row):
+    <span class="kw">if not</span> row[<span class="str">"거래일자"</span>].strip():
+        <span class="kw">return</span> <span class="str">"거래일자 누락"</span>
+    <span class="kw">if not</span> row[<span class="str">"거래처"</span>].strip():
+        <span class="kw">return</span> <span class="str">"거래처 누락"</span>
+
+    <span class="kw">try</span>:
+        amount = <span class="fn">int</span>(row[<span class="str">"금액"</span>])
+        <span class="kw">if</span> amount &lt;= <span class="num">0</span>:
+            <span class="kw">return</span> <span class="str">"금액이 0 이하"</span>
+    <span class="kw">except</span> ValueError:
+        <span class="kw">return</span> <span class="str">"금액이 숫자가 아님"</span>
+
+    <span class="kw">return</span> <span class="str">""</span>
+
+
+<span class="kw">def</span> <span class="fn">validate_and_classify</span>():
+    input_path = Path(<span class="str">"output/merged_transactions.csv"</span>)
+    clean_path = Path(<span class="str">"output/clean_transactions.csv"</span>)
+    review_path = Path(<span class="str">"output/review_transactions.csv"</span>)
+
+    clean_rows, review_rows = [], []
+
+    <span class="kw">with</span> <span class="fn">open</span>(input_path, <span class="str">"r"</span>, encoding=<span class="str">"utf-8-sig"</span>) <span class="kw">as</span> file:
+        <span class="kw">for</span> row <span class="kw">in</span> csv.DictReader(file):
+            error = validate_row(row)
+
+            <span class="kw">if</span> error:
+                row[<span class="str">"계정과목"</span>] = <span class="str">""</span>
+                row[<span class="str">"처리상태"</span>] = error
+                review_rows.append(row)
+                <span class="kw">continue</span>
+
+            row[<span class="str">"금액"</span>] = <span class="fn">int</span>(row[<span class="str">"금액"</span>])
+            row[<span class="str">"계정과목"</span>] = classify_account(row[<span class="str">"거래처"</span>])
+            row[<span class="str">"처리상태"</span>] = <span class="str">"정상"</span> <span class="kw">if</span> row[<span class="str">"계정과목"</span>] != <span class="str">"확인 필요"</span> <span class="kw">else</span> <span class="str">"계정과목 확인"</span>
+            clean_rows.append(row)
+
+            <span class="kw">if</span> row[<span class="str">"처리상태"</span>] != <span class="str">"정상"</span>:
+                review_rows.append(row.copy())
+
+    fieldnames = [<span class="str">"원본파일"</span>, <span class="str">"거래일자"</span>, <span class="str">"거래처"</span>, <span class="str">"금액"</span>, <span class="str">"결제수단"</span>, <span class="str">"메모"</span>, <span class="str">"계정과목"</span>, <span class="str">"처리상태"</span>]
+
+    <span class="kw">for</span> path, rows <span class="kw">in</span> [(clean_path, clean_rows), (review_path, review_rows)]:
+        <span class="kw">with</span> <span class="fn">open</span>(path, <span class="str">"w"</span>, newline=<span class="str">""</span>, encoding=<span class="str">"utf-8-sig"</span>) <span class="kw">as</span> file:
+            writer = csv.DictWriter(file, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(rows)
+
+    <span class="fn">print</span>(<span class="str">f"정상·분류완료: {len(clean_rows)}건"</span>)
+    <span class="fn">print</span>(<span class="str">f"확인 필요: {len(review_rows)}건"</span>)
+
+
+validate_and_classify()</code></pre>
+      <div class="output"><strong>실행 결과</strong>
+정상·분류완료: 16건
+확인 필요: 4건</div>
+      <div class="warning"><strong>중요:</strong> 규칙에 없는 거래를 추측해서 강제 분류하지 않습니다. <code>확인 필요</code>로 남기는 것이 잘못된 자동 분류보다 안전합니다.</div><div class="section-footer"><a class="pill" href="#top">↑ 맨 위로</a></div>
+    </section>
+
+    <section class="lesson" id="step3"><p class="section-label">STEP 03</p><h2>Excel 보고서 자동 생성</h2><p class="lead"><code>openpyxl</code>을 이용해 전체 거래내역, 계정과목별 합계, 확인 필요 거래를 각각의 시트로 만듭니다.</p>
+      <h3>openpyxl 설치</h3><p>VS Code 터미널에서 한 번만 실행합니다.</p><div class="code-title"><span>Terminal</span><span>라이브러리 설치</span></div><pre><code>python -m pip install openpyxl</code></pre>
+      <div class="code-title"><span>step3_report.py</span><span>Excel 다중 시트 보고서</span></div><pre><code><span class="kw">from</span> pathlib <span class="kw">import</span> Path
+<span class="kw">from</span> collections <span class="kw">import</span> defaultdict
+<span class="kw">import</span> csv
+
+<span class="kw">from</span> openpyxl <span class="kw">import</span> Workbook
+<span class="kw">from</span> openpyxl.styles <span class="kw">import</span> Font, PatternFill, Alignment
+<span class="kw">from</span> openpyxl.utils <span class="kw">import</span> get_column_letter
+
+
+<span class="kw">def</span> <span class="fn">read_csv</span>(file_path):
+    <span class="kw">with</span> <span class="fn">open</span>(file_path, <span class="str">"r"</span>, encoding=<span class="str">"utf-8-sig"</span>) <span class="kw">as</span> file:
+        <span class="kw">return</span> <span class="fn">list</span>(csv.DictReader(file))
+
+
+<span class="kw">def</span> <span class="fn">style_sheet</span>(sheet, header_color):
+    <span class="kw">for</span> cell <span class="kw">in</span> sheet[<span class="num">1</span>]:
+        cell.fill = PatternFill(<span class="str">"solid"</span>, fgColor=header_color)
+        cell.font = Font(color=<span class="str">"FFFFFF"</span>, bold=<span class="kw">True</span>)
+        cell.alignment = Alignment(horizontal=<span class="str">"center"</span>)
+
+    <span class="kw">for</span> column <span class="kw">in</span> sheet.columns:
+        width = <span class="fn">max</span>(<span class="fn">len</span>(<span class="fn">str</span>(cell.value <span class="kw">or</span> <span class="str">""</span>)) <span class="kw">for</span> cell <span class="kw">in</span> column) + <span class="num">2</span>
+        sheet.column_dimensions[get_column_letter(column[<span class="num">0</span>].column)].width = <span class="fn">min</span>(width, <span class="num">30</span>)
+
+    sheet.freeze_panes = <span class="str">"A2"</span>
+    sheet.auto_filter.ref = sheet.dimensions
+
+
+<span class="kw">def</span> <span class="fn">create_report</span>():
+    output_folder = Path(<span class="str">"output"</span>)
+    clean_rows = read_csv(output_folder / <span class="str">"clean_transactions.csv"</span>)
+    review_rows = read_csv(output_folder / <span class="str">"review_transactions.csv"</span>)
+    headers = [<span class="str">"원본파일"</span>, <span class="str">"거래일자"</span>, <span class="str">"거래처"</span>, <span class="str">"금액"</span>, <span class="str">"결제수단"</span>, <span class="str">"메모"</span>, <span class="str">"계정과목"</span>, <span class="str">"처리상태"</span>]
+
+    workbook = Workbook()
+    all_sheet = workbook.active
+    all_sheet.title = <span class="str">"전체 거래내역"</span>
+    all_sheet.append(headers)
+
+    <span class="kw">for</span> row <span class="kw">in</span> clean_rows:
+        row[<span class="str">"금액"</span>] = <span class="fn">int</span>(row[<span class="str">"금액"</span>])
+        all_sheet.append([row[header] <span class="kw">for</span> header <span class="kw">in</span> headers])
+
+    totals = defaultdict(<span class="fn">int</span>)
+    counts = defaultdict(<span class="fn">int</span>)
+    <span class="kw">for</span> row <span class="kw">in</span> clean_rows:
+        totals[row[<span class="str">"계정과목"</span>]] += row[<span class="str">"금액"</span>]
+        counts[row[<span class="str">"계정과목"</span>]] += <span class="num">1</span>
+
+    summary_sheet = workbook.create_sheet(<span class="str">"계정과목별 합계"</span>)
+    summary_sheet.append([<span class="str">"계정과목"</span>, <span class="str">"거래 건수"</span>, <span class="str">"합계 금액"</span>])
+    <span class="kw">for</span> account <span class="kw">in</span> <span class="fn">sorted</span>(totals):
+        summary_sheet.append([account, counts[account], totals[account]])
+    summary_sheet.append([<span class="str">"전체 합계"</span>, <span class="fn">sum</span>(counts.values()), <span class="fn">sum</span>(totals.values())])
+
+    review_sheet = workbook.create_sheet(<span class="str">"확인 필요 거래"</span>)
+    review_sheet.append(headers)
+    <span class="kw">for</span> row <span class="kw">in</span> review_rows:
+        review_sheet.append([row.get(header, <span class="str">""</span>) <span class="kw">for</span> header <span class="kw">in</span> headers])
+
+    style_sheet(all_sheet, <span class="str">"1D4ED8"</span>)
+    style_sheet(summary_sheet, <span class="str">"6D28D9"</span>)
+    style_sheet(review_sheet, <span class="str">"EA580C"</span>)
+
+    <span class="kw">for</span> cell <span class="kw">in</span> all_sheet[<span class="str">"D"</span>][<span class="num">1</span>:]:
+        cell.number_format = <span class="str">"#,##0"</span>
+    <span class="kw">for</span> cell <span class="kw">in</span> summary_sheet[<span class="str">"C"</span>][<span class="num">1</span>:]:
+        cell.number_format = <span class="str">"#,##0"</span>
+
+    report_path = output_folder / <span class="str">"거래내역_자동정리_보고서.xlsx"</span>
+    workbook.save(report_path)
+    <span class="fn">print</span>(<span class="str">f"보고서가 생성되었습니다: {report_path.resolve()}"</span>)
+
+
+create_report()</code></pre>
+      <div class="output"><strong>생성 결과</strong>
+output/거래내역_자동정리_보고서.xlsx
+├─ 전체 거래내역: 16건
+├─ 계정과목별 합계: 1,252,500원
+└─ 확인 필요 거래: 4건</div>
+      <div class="note">완성 결과 예시와 시트 순서·합계가 같은지 비교합니다. 실제 데이터에서는 분류 규칙과 검증 기준을 업무에 맞게 조정해야 합니다.</div><div class="section-footer"><a class="pill" href="#top">↑ 맨 위로</a></div>
+    </section>
+
+    <section class="lesson" id="finish"><p class="section-label">WRAP-UP</p><h2>프로젝트 정리</h2><table><thead><tr><th>단계</th><th>자동화한 반복 업무</th><th>핵심 도구</th></tr></thead><tbody><tr><td>1단계</td><td>여러 파일 열기·복사·붙여넣기</td><td><code>pathlib</code>, <code>csv</code></td></tr><tr><td>2단계</td><td>누락·금액 오류 확인과 계정과목 1차 분류</td><td>함수, 조건문, 예외처리, 딕셔너리</td></tr><tr><td>3단계</td><td>전체·요약·오류 보고서 작성</td><td><code>openpyxl</code></td></tr></tbody></table>
+      <h3>완성 체크리스트</h3><ul class="check"><li><code>input</code> 폴더의 CSV 3개가 자동으로 검색된다.</li><li>18건이 하나의 CSV로 통합된다.</li><li>거래처 누락과 금액 오류가 별도 파일로 분리된다.</li><li>규칙에 없는 거래는 <code>확인 필요</code>로 남는다.</li><li>Excel 보고서에 시트 3개가 생성된다.</li><li>계정과목별 전체 합계가 1,252,500원이다.</li></ul>
+      <div class="tip"><strong>업무 적용 원칙:</strong> 자동화의 목적은 판단을 없애는 것이 아니라 반복 작업을 줄이고, 사람이 확인해야 할 거래를 더 선명하게 분리하는 것입니다.</div><div class="section-footer"><a class="pill" href="#top">↑ 맨 위로</a></div>
+    </section>
+  </main>
+  <footer>MACO 6 · 파이썬 활용 업무자동화 과정 · 거래내역 자동 정리 프로젝트</footer>
+  <script>
+    const form=document.getElementById('passwordForm');const input=document.getElementById('passwordInput');const message=document.getElementById('passwordMessage');const screen=document.getElementById('passwordScreen');
+    form.addEventListener('submit',event=>{event.preventDefault();if(input.value==='20261111'){screen.classList.add('open');document.body.classList.remove('locked');message.textContent='';}else{message.textContent='비밀번호가 올바르지 않습니다.';input.value='';input.focus();}});
+  </script>
+</body>
+</html>
