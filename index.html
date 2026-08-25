@@ -266,6 +266,8 @@ validate_and_classify()</code></pre>
 
     <section class="lesson" id="step3"><p class="section-label">STEP 03</p><h2>Excel 보고서 자동 생성</h2><p class="lead"><code>openpyxl</code>을 이용해 전체 거래내역, 계정과목별 합계, 확인 필요 거래를 각각의 시트로 만듭니다.</p>
       <h3>openpyxl 설치</h3><p>VS Code 터미널에서 한 번만 실행합니다.</p><div class="code-title"><span>Terminal</span><span>라이브러리 설치</span></div><pre><code>python -m pip install openpyxl</code></pre>
+      <div class="note"><strong>Python 3.13을 사용하는 경우:</strong> 위 명령으로 설치했는데도 <code>ModuleNotFoundError: No module named 'openpyxl'</code>이 발생하면, 다음 명령으로 Python 3.13에 직접 설치합니다.</div>
+      <div class="code-title"><span>Terminal</span><span>Python 3.13에 설치</span></div><pre><code>py -3.13 -m pip install openpyxl</code></pre>
       <div class="code-title"><span>step3_report.py</span><span>Excel 다중 시트 보고서</span></div><pre><code><span class="comment"># 파일 경로, 항목별 합계, CSV 읽기에 필요한 도구를 가져옵니다.</span>
 <span class="kw">from</span> pathlib <span class="kw">import</span> Path
 <span class="kw">from</span> collections <span class="kw">import</span> defaultdict
@@ -366,6 +368,8 @@ create_report()</code></pre>
       <h3>실행하기</h3>
       <p>먼저 1단계와 2단계를 차례대로 실행한 후 다음 명령을 입력합니다.</p>
       <div class="code-title"><span>Terminal</span><span>3단계 실행</span></div><pre><code>python step3_report.py</code></pre>
+      <p>Python 3.13에 설치했다면 같은 버전으로 프로그램을 실행합니다.</p>
+      <div class="code-title"><span>Terminal</span><span>Python 3.13으로 실행</span></div><pre><code>py -3.13 step3_report.py</code></pre>
       <div class="output"><strong>생성 결과</strong>
 output/거래내역_자동정리_보고서.xlsx
 ├─ 전체 거래내역: 16건
