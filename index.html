@@ -31,7 +31,7 @@
   </div>
 
   <header class="hero"><p class="eyebrow">MACO 6 · PYTHON WORK AUTOMATION</p><h1>거래내역 자동 정리·보고서 생성</h1><p>폴더에 들어 있는 카드·통장 거래내역 CSV를 자동으로 통합하고, 오류 검사와 계정과목 분류를 거쳐 Excel 보고서를 생성합니다.</p></header>
-  <div class="nav-wrap"><nav><a href="#overview">개요</a><a href="#download">실습파일</a><a href="#step1">1. 통합</a><a href="#step2">2. 검증·분류</a><a href="#step3">3. Excel 보고서</a><a href="#finish">정리</a></nav></div>
+  <div class="nav-wrap"><nav><a href="#overview">개요</a><a href="#download">실습파일</a><a href="#step1">1. 통합</a><a href="#step2">2. 검증·분류</a><a href="#step3">3. Excel 보고서</a><a href="#finish">정리</a><a href="#development">발전시키기</a></nav></div>
 
   <main>
     <section class="lesson" id="overview"><p class="section-label">PROJECT OVERVIEW</p><h2>프로젝트 개요</h2><p class="lead">한 건씩 직접 입력하지 않습니다. 정해진 폴더에 거래내역 파일을 넣고 프로그램을 실행하면 파이썬이 반복 작업을 일괄 처리합니다.</p>
@@ -390,6 +390,428 @@ output/거래내역_자동정리_보고서.xlsx
     <section class="lesson" id="finish"><p class="section-label">WRAP-UP</p><h2>프로젝트 정리</h2><table><thead><tr><th>단계</th><th>자동화한 반복 업무</th><th>핵심 도구</th></tr></thead><tbody><tr><td>1단계</td><td>여러 파일 열기·복사·붙여넣기</td><td><code>pathlib</code>, <code>csv</code></td></tr><tr><td>2단계</td><td>누락·금액 오류 확인과 계정과목 1차 분류</td><td>함수, 조건문, 예외처리, 딕셔너리</td></tr><tr><td>3단계</td><td>전체·요약·오류 보고서 작성</td><td><code>openpyxl</code></td></tr></tbody></table>
       <h3>완성 체크리스트</h3><ul class="check"><li><code>input</code> 폴더의 CSV 3개가 자동으로 검색된다.</li><li>18건이 하나의 CSV로 통합된다.</li><li>거래처 누락과 금액 오류가 별도 파일로 분리된다.</li><li>규칙에 없는 거래는 <code>확인 필요</code>로 남는다.</li><li>Excel 보고서에 시트 3개가 생성된다.</li><li>계정과목별 전체 합계가 1,252,500원이다.</li></ul>
       <div class="tip"><strong>업무 적용 원칙:</strong> 자동화의 목적은 판단을 없애는 것이 아니라 반복 작업을 줄이고, 사람이 확인해야 할 거래를 더 선명하게 분리하는 것입니다.</div><div class="section-footer"><a class="pill" href="#top">↑ 맨 위로</a></div>
+    </section>
+
+    <section class="lesson" id="development">
+      <p class="section-label">ADVANCED MISSION</p>
+      <h2>발전시키기 미션: 서로 다른 컬럼의 파일 정리</h2>
+      <p class="lead">기본 프로젝트에서는 세 CSV의 컬럼이 이미 같다고 가정했습니다. 이번 미션에서는 카드사와 은행마다 다른 컬럼 이름과 날짜·금액 형식을 하나의 표준 형식으로 바꾼 후, 통합 CSV와 Excel 보고서를 한 번에 생성합니다.</p>
+      <div class="warning"><strong>기본 프로젝트와의 관계:</strong> 앞의 3단계가 잘못된 것은 아닙니다. 앞부분은 이미 같은 양식으로 정리된 사내 파일을 처리하는 기본 과정이고, 이번 미션은 카드사·은행에서 내려받은 서로 다른 원본 파일을 먼저 표준화하는 발전 과정입니다.</div>
+
+      <h3>발전 실습파일 다운로드</h3>
+      <div class="downloads">
+        <a class="download" href="maco6_development_pack.zip" download><span>📦 발전 실습파일 전체 묶음<small>실행 폴더·CSV 3개·파이썬 코드·예상 결과</small></span><b>ZIP 받기</b></a>
+        <a class="download" href="development_mission.py" download><span>🐍 전체 실행 코드<small>형식 판별부터 Excel 보고서까지 한 번에 실행</small></span><b>PY 받기</b></a>
+        <a class="download" href="advanced_card_a.csv" download><span>💳 카드사 A 파일<small>이용일·가맹점명·이용금액</small></span><b>CSV 받기</b></a>
+        <a class="download" href="advanced_bank.csv" download><span>🏦 은행 파일<small>거래일시·적요·출금액</small></span><b>CSV 받기</b></a>
+        <a class="download" href="advanced_card_b.csv" download><span>💳 카드사 B 파일<small>승인일자·이용가맹점·승인금액</small></span><b>CSV 받기</b></a>
+        <a class="download" href="standardized_transactions_example.csv" download><span>✅ 표준화 결과 예시<small>12건을 동일한 컬럼으로 정리한 결과</small></span><b>CSV 받기</b></a>
+      </div>
+
+      <h3>세 파일의 서로 다른 컬럼</h3>
+      <table>
+        <thead><tr><th>표준 컬럼</th><th>카드사 A</th><th>은행</th><th>카드사 B</th></tr></thead>
+        <tbody>
+          <tr><td>거래일자</td><td>이용일</td><td>거래일시</td><td>승인일자</td></tr>
+          <tr><td>거래처</td><td>가맹점명</td><td>적요</td><td>이용가맹점</td></tr>
+          <tr><td>금액</td><td>이용금액</td><td>출금액</td><td>승인금액</td></tr>
+          <tr><td>결제수단</td><td>카드구분</td><td>거래구분</td><td>지급수단</td></tr>
+          <tr><td>메모</td><td>비고</td><td>내용</td><td>이용구분</td></tr>
+        </tbody>
+      </table>
+
+      <h3>압축을 푼 뒤의 폴더 구성</h3>
+      <div class="code-title"><span>폴더</span><span>발전 실습</span></div><pre><code>maco6_development_pack/
+├── advanced_input/
+│   ├── advanced_card_a.csv
+│   ├── advanced_bank.csv
+│   └── advanced_card_b.csv
+├── advanced_output/
+├── expected/
+│   └── standardized_transactions_example.csv
+└── development_mission.py</code></pre>
+
+      <h3>전체 코드</h3>
+      <p>이번에는 세 파일을 나누어 실행하지 않습니다. 아래의 <code>development_mission.py</code> 한 파일이 컬럼 구조 판별, 컬럼명 표준화, 날짜·금액 정리, 통합, 계정과목 분류, Excel 보고서 생성을 모두 수행합니다.</p>
+      <div class="code-title"><span>development_mission.py</span><span>한 번에 실행하는 발전 코드</span></div><pre><code>
+from pathlib import Path
+from datetime import datetime
+from collections import defaultdict
+import csv
+
+from openpyxl import Workbook
+from openpyxl.styles import Font, PatternFill, Alignment
+from openpyxl.utils import get_column_letter
+
+
+# 이 파이썬 파일이 들어 있는 폴더를 기준 경로로 사용합니다.
+# 따라서 VS Code 터미널이 다른 폴더에 있어도 파일 경로가 흔들리지 않습니다.
+BASE_DIR = Path(__file__).resolve().parent
+INPUT_FOLDER = BASE_DIR / "advanced_input"
+OUTPUT_FOLDER = BASE_DIR / "advanced_output"
+
+
+# 기관마다 다른 원본 컬럼을 공통 컬럼으로 바꾸기 위한 규칙입니다.
+# 왼쪽은 원본 CSV의 컬럼명이고, 오른쪽은 프로그램에서 사용할 표준 컬럼명입니다.
+COLUMN_RULES = {
+    "카드사 A": {
+        "이용일": "거래일자",
+        "가맹점명": "거래처",
+        "이용금액": "금액",
+        "카드구분": "결제수단",
+        "비고": "메모",
+    },
+    "은행": {
+        "거래일시": "거래일자",
+        "적요": "거래처",
+        "출금액": "금액",
+        "거래구분": "결제수단",
+        "내용": "메모",
+    },
+    "카드사 B": {
+        "승인일자": "거래일자",
+        "이용가맹점": "거래처",
+        "승인금액": "금액",
+        "지급수단": "결제수단",
+        "이용구분": "메모",
+    },
+}
+
+
+# 표준화가 끝난 거래처명을 이용해 계정과목을 분류합니다.
+# 이 부분은 앞의 기본 프로젝트에서 사용한 규칙과 같은 역할을 합니다.
+ACCOUNT_RULES = {
+    "스타벅스": "복리후생비",
+    "배달의민족": "복리후생비",
+    "쿠팡": "소모품비",
+    "알파문구": "소모품비",
+    "코레일": "여비교통비",
+    "한국전력": "수도광열비",
+    "사무실임대": "임차료",
+    "KT": "통신비",
+    "네이버클라우드": "통신비",
+    "국세청": "세금과공과",
+    "세무법인": "지급수수료",
+}
+
+
+# 최종 CSV와 Excel 시트에 기록할 표준 컬럼과 순서입니다.
+STANDARD_COLUMNS = [
+    "원본파일",
+    "원본형식",
+    "거래일자",
+    "거래처",
+    "금액",
+    "결제수단",
+    "메모",
+    "계정과목",
+    "처리상태",
+]
+
+
+def detect_file_format(fieldnames):
+    """CSV의 컬럼 조합을 검사하여 어느 기관 형식인지 판별합니다."""
+
+    # DictReader가 읽은 컬럼명을 집합으로 바꾸면 포함 여부를 쉽게 검사할 수 있습니다.
+    file_columns = set(fieldnames or [])
+
+    # 등록된 기관별 규칙을 하나씩 확인합니다.
+    for format_name, column_map in COLUMN_RULES.items():
+        required_columns = set(column_map.keys())
+
+        # 현재 파일이 해당 기관의 필수 컬럼을 모두 가지고 있으면 그 규칙을 반환합니다.
+        # 원본 파일에 추가 컬럼이 더 있어도 필수 컬럼만 있으면 처리할 수 있습니다.
+        if required_columns.issubset(file_columns):
+            return format_name, column_map
+
+    # 어떤 규칙과도 맞지 않으면 억지로 합치지 않고 오류를 발생시킵니다.
+    raise ValueError(
+        "등록되지 않은 컬럼 구조입니다: "
+        + ", ".join(fieldnames or [])
+    )
+
+
+def normalize_date(value):
+    """여러 형태의 날짜를 YYYY-MM-DD 형식으로 통일합니다."""
+
+    value = value.strip()
+
+    # 실습파일에서 사용한 날짜 형식을 차례대로 대입해 봅니다.
+    date_formats = [
+        "%Y-%m-%d",
+        "%Y.%m.%d",
+        "%Y/%m/%d",
+        "%Y%m%d",
+        "%Y%m%d %H:%M",
+    ]
+
+    for date_format in date_formats:
+        try:
+            parsed_date = datetime.strptime(value, date_format)
+            return parsed_date.strftime("%Y-%m-%d")
+        except ValueError:
+            # 현재 형식과 맞지 않으면 다음 날짜 형식으로 다시 시도합니다.
+            continue
+
+    raise ValueError(f"지원하지 않는 날짜 형식: {value}")
+
+
+def normalize_amount(value):
+    """금액의 쉼표·원·공백을 제거하고 계산 가능한 정수로 바꿉니다."""
+
+    cleaned_value = (
+        value.strip()
+        .replace(",", "")
+        .replace("원", "")
+        .replace(" ", "")
+    )
+
+    try:
+        return int(cleaned_value)
+    except ValueError as error:
+        raise ValueError(f"금액을 숫자로 바꿀 수 없음: {value}") from error
+
+
+def classify_account(merchant):
+    """거래처 키워드를 이용하여 계정과목을 반환합니다."""
+
+    for keyword, account in ACCOUNT_RULES.items():
+        if keyword in merchant:
+            return account
+
+    return "확인 필요"
+
+
+def standardize_row(row, file_name, format_name, column_map):
+    """서로 다른 원본 행을 하나의 표준 거래내역으로 변환합니다."""
+
+    standardized = {}
+
+    # 원본 컬럼의 값을 가져와 대응하는 표준 컬럼명으로 저장합니다.
+    for original_column, standard_column in column_map.items():
+        standardized[standard_column] = row.get(original_column, "").strip()
+
+    # 필수값이 비어 있으면 잘못된 자료가 섞이지 않도록 중단합니다.
+    if not standardized["거래일자"]:
+        raise ValueError("거래일자 누락")
+    if not standardized["거래처"]:
+        raise ValueError("거래처 누락")
+    if not standardized["금액"]:
+        raise ValueError("금액 누락")
+
+    # 컬럼 이름뿐 아니라 날짜와 금액의 값 형식도 통일합니다.
+    standardized["거래일자"] = normalize_date(standardized["거래일자"])
+    standardized["금액"] = normalize_amount(standardized["금액"])
+
+    # 표준화된 거래처명을 이용해 기존 분류 규칙을 적용합니다.
+    account = classify_account(standardized["거래처"])
+    status = "정상" if account != "확인 필요" else "계정과목 확인"
+
+    # 최종 결과는 모든 원본 파일에서 동일한 컬럼과 순서를 갖습니다.
+    return {
+        "원본파일": file_name,
+        "원본형식": format_name,
+        "거래일자": standardized["거래일자"],
+        "거래처": standardized["거래처"],
+        "금액": standardized["금액"],
+        "결제수단": standardized["결제수단"],
+        "메모": standardized["메모"],
+        "계정과목": account,
+        "처리상태": status,
+    }
+
+
+def load_and_standardize_files():
+    """advanced_input의 모든 CSV를 읽어 표준 거래내역으로 통합합니다."""
+
+    csv_files = sorted(INPUT_FOLDER.glob("*.csv"))
+
+    if not csv_files:
+        print(f"CSV 파일이 없습니다: {INPUT_FOLDER}")
+        return []
+
+    all_rows = []
+
+    for csv_file in csv_files:
+        with open(csv_file, "r", encoding="utf-8-sig") as file:
+            reader = csv.DictReader(file)
+
+            # 파일명이 아니라 실제 컬럼 조합으로 기관 형식을 판별합니다.
+            format_name, column_map = detect_file_format(reader.fieldnames)
+            print(f"{csv_file.name} → {format_name} 형식으로 판별")
+
+            for line_number, row in enumerate(reader, start=2):
+                try:
+                    standardized_row = standardize_row(
+                        row,
+                        csv_file.name,
+                        format_name,
+                        column_map,
+                    )
+                    all_rows.append(standardized_row)
+                except ValueError as error:
+                    # 오류가 난 행과 이유를 화면에 알려 주고 다음 행을 계속 처리합니다.
+                    print(f"  {line_number}행 제외: {error}")
+
+    # 파일 종류와 관계없이 최종 결과를 거래일자순으로 정렬합니다.
+    all_rows.sort(key=lambda row: (row["거래일자"], row["원본파일"]))
+    return all_rows
+
+
+def save_standard_csv(rows):
+    """표준화한 전체 거래를 하나의 CSV 파일로 저장합니다."""
+
+    csv_path = OUTPUT_FOLDER / "standardized_transactions.csv"
+
+    with open(
+        csv_path,
+        "w",
+        newline="",
+        encoding="utf-8-sig",
+    ) as file:
+        writer = csv.DictWriter(file, fieldnames=STANDARD_COLUMNS)
+        writer.writeheader()
+        writer.writerows(rows)
+
+    return csv_path
+
+
+def style_sheet(sheet, header_color):
+    """Excel 시트의 제목과 열 너비에 공통 서식을 적용합니다."""
+
+    for cell in sheet[1]:
+        cell.fill = PatternFill("solid", fgColor=header_color)
+        cell.font = Font(color="FFFFFF", bold=True)
+        cell.alignment = Alignment(horizontal="center")
+
+    for column in sheet.columns:
+        width = max(len(str(cell.value or "")) for cell in column) + 2
+        sheet.column_dimensions[get_column_letter(column[0].column)].width = min(
+            width,
+            30,
+        )
+
+    sheet.freeze_panes = "A2"
+    sheet.auto_filter.ref = sheet.dimensions
+
+
+def create_excel_report(rows):
+    """표준 거래·계정과목별 합계·확인 필요 시트가 있는 보고서를 만듭니다."""
+
+    workbook = Workbook()
+
+    # 첫 번째 시트에는 표준화된 전체 거래를 기록합니다.
+    transaction_sheet = workbook.active
+    transaction_sheet.title = "표준 거래내역"
+    transaction_sheet.append(STANDARD_COLUMNS)
+
+    for row in rows:
+        transaction_sheet.append([row[column] for column in STANDARD_COLUMNS])
+
+    # 두 번째 시트에는 계정과목별 거래 건수와 합계를 기록합니다.
+    totals = defaultdict(int)
+    counts = defaultdict(int)
+
+    for row in rows:
+        totals[row["계정과목"]] += row["금액"]
+        counts[row["계정과목"]] += 1
+
+    summary_sheet = workbook.create_sheet("계정과목별 합계")
+    summary_sheet.append(["계정과목", "거래 건수", "합계 금액"])
+
+    for account in sorted(totals):
+        summary_sheet.append([account, counts[account], totals[account]])
+
+    summary_sheet.append(
+        ["전체 합계", sum(counts.values()), sum(totals.values())]
+    )
+
+    # 세 번째 시트에는 사람이 계정과목을 확인해야 할 거래만 기록합니다.
+    review_sheet = workbook.create_sheet("확인 필요 거래")
+    review_sheet.append(STANDARD_COLUMNS)
+
+    for row in rows:
+        if row["처리상태"] != "정상":
+            review_sheet.append([row[column] for column in STANDARD_COLUMNS])
+
+    style_sheet(transaction_sheet, "1D4ED8")
+    style_sheet(summary_sheet, "6D28D9")
+    style_sheet(review_sheet, "EA580C")
+
+    # 금액 열에는 천 단위 쉼표 서식을 적용합니다.
+    for cell in transaction_sheet["E"][1:]:
+        cell.number_format = "#,##0"
+    for cell in summary_sheet["C"][1:]:
+        cell.number_format = "#,##0"
+
+    report_path = OUTPUT_FOLDER / "different_columns_report.xlsx"
+    workbook.save(report_path)
+    return report_path
+
+
+def main():
+    """컬럼 판별부터 표준화·통합·보고서 생성까지 한 번에 실행합니다."""
+
+    OUTPUT_FOLDER.mkdir(exist_ok=True)
+    rows = load_and_standardize_files()
+
+    if not rows:
+        return
+
+    csv_path = save_standard_csv(rows)
+    report_path = create_excel_report(rows)
+    total_amount = sum(row["금액"] for row in rows)
+
+    print()
+    print(f"표준화 완료: {len(rows)}건")
+    print(f"전체 합계: {total_amount:,}원")
+    print(f"CSV 저장: {csv_path}")
+    print(f"Excel 저장: {report_path}")
+
+
+if __name__ == "__main__":
+    main()
+      </code></pre>
+
+      <h3>실행하기</h3>
+      <p>VS Code에서 압축을 푼 <code>maco6_development_pack</code> 폴더를 열고 터미널에서 실행합니다.</p>
+      <div class="code-title"><span>Terminal</span><span>openpyxl 설치</span></div><pre><code>py -3.13 -m pip install openpyxl</code></pre>
+      <div class="code-title"><span>Terminal</span><span>발전 미션 실행</span></div><pre><code>py -3.13 development_mission.py</code></pre>
+      <div class="output"><strong>실행 결과</strong>
+advanced_bank.csv → 은행 형식으로 판별
+advanced_card_a.csv → 카드사 A 형식으로 판별
+advanced_card_b.csv → 카드사 B 형식으로 판별
+
+표준화 완료: 12건
+전체 합계: 1,176,300원
+CSV 저장: ...\advanced_output\standardized_transactions.csv
+Excel 저장: ...\advanced_output\different_columns_report.xlsx</div>
+
+      <h3>새롭게 추가된 부분 이해하기</h3>
+      <h4>1. 기관별 컬럼 변환 규칙 등록</h4>
+      <p><code>COLUMN_RULES</code>에는 각 기관의 원본 컬럼과 프로그램에서 사용할 표준 컬럼의 대응 관계가 들어 있습니다. 예를 들어 카드사 A의 <code>이용일</code>, 은행의 <code>거래일시</code>, 카드사 B의 <code>승인일자</code>는 모두 <code>거래일자</code>로 바뀝니다.</p>
+
+      <h4>2. 파일명이 아니라 실제 컬럼 조합으로 형식 판별</h4>
+      <p><code>detect_file_format()</code>은 파일의 첫 행에 있는 컬럼명을 읽고 등록된 규칙과 비교합니다. 필요한 컬럼을 모두 가지고 있으면 해당 기관의 형식으로 판별합니다. 파일명이 바뀌어도 컬럼 구조가 같으면 처리할 수 있습니다.</p>
+
+      <h4>3. 컬럼명과 값 형식을 함께 표준화</h4>
+      <p><code>standardize_row()</code>은 원본 컬럼의 값을 표준 컬럼으로 옮깁니다. 컬럼 이름만 바꾸는 것으로 끝내지 않고 <code>normalize_date()</code>와 <code>normalize_amount()</code>를 호출하여 날짜와 금액도 계산 가능한 형태로 바꿉니다.</p>
+
+      <h4>4. 서로 다른 날짜 형식 통일</h4>
+      <p><code>2026.10.02</code>, <code>2026/10/06</code>, <code>20261004</code>, <code>20261005 09:30</code>처럼 표현이 다른 날짜를 모두 <code>2026-10-02</code>와 같은 <code>YYYY-MM-DD</code> 형식으로 저장합니다.</p>
+
+      <h4>5. 문자처럼 보이는 금액을 정수로 변환</h4>
+      <p><code>12,500</code>, <code>35,000원</code>, <code>88000</code>에서 쉼표·원·공백을 제거한 뒤 정수로 변환합니다. 이 과정을 거쳐야 계정과목별 합계와 전체 합계를 정확하게 계산할 수 있습니다.</p>
+
+      <h4>6. 원본 추적 정보 유지</h4>
+      <p>표준화가 끝나도 <code>원본파일</code>과 <code>원본형식</code>을 결과에 남깁니다. 결과값이 이상할 때 어떤 기관의 어느 파일에서 들어온 거래인지 다시 확인할 수 있습니다.</p>
+
+      <h4>7. 표준화 이후에는 기존 처리 방식 재사용</h4>
+      <p>모든 거래가 <code>거래일자·거래처·금액·결제수단·메모</code> 구조로 통일된 다음에는 앞에서 학습한 계정과목 분류와 Excel 보고서 생성 방식을 그대로 적용할 수 있습니다. 새로 추가된 핵심은 기존 처리 앞에 놓인 <strong>형식 판별과 표준화 과정</strong>입니다.</p>
+
+      <div class="warning"><strong>반드시 확인할 한계:</strong> 이 코드는 등록된 세 가지 컬럼 구조만 처리합니다. 새로운 카드사나 은행 파일이 들어오면 <code>COLUMN_RULES</code>에 그 기관의 규칙을 추가해야 합니다. 특히 <code>출금액</code>, <code>입금액</code>, <code>취소금액</code>은 이름이 비슷해도 회계적 의미가 다르므로 프로그램이 임의로 추측하게 만들면 안 됩니다.</div>
+      <div class="tip"><strong>미션 완료 기준:</strong> 서로 다른 컬럼의 CSV 3개가 기관별 형식으로 판별되고, 12건이 동일한 표준 컬럼으로 정리되며, 전체 합계가 1,176,300원인 Excel 보고서가 생성되면 완료입니다.</div>
+      <div class="section-footer"><a class="pill" href="#top">↑ 맨 위로</a></div>
     </section>
   </main>
   <footer>MACO 6 · 파이썬 활용 업무자동화 과정 · 거래내역 자동 정리 프로젝트</footer>
